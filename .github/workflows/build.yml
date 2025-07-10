@@ -13,7 +13,7 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.0'  # o la versione che usi
+          xcode-version: '15.0'  # o la versione che usi
 
       - name: Build archive (no signing)
         run: |
