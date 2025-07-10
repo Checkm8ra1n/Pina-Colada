@@ -1,38 +1,34 @@
-name: Build and Release IPA
+name: Build without Signing
 
 on:
   push:
     tags:
-      - 'v*'  # trigger solo su tag come v1.0.0
+      - 'v*'
 
 jobs:
   build:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '16.0'  # cambia se usi altra versione
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'  # o la versione che usi
 
-    - name: Build IPA
-      run: |
-        xcodebuild -project "Pina Colada.xcodeproj" \
-                   -scheme "Pina Colada" \
-                   -configuration Release \
-                   -sdk iphoneos \
-                   -archivePath $PWD/build/PinaColada.xcarchive archive
+      - name: Build archive (no signing)
+        run: |
+          xcodebuild -project "Pina Colada.xcodeproj" \
+            -scheme "Pina Colada" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/build/PinaColada.xcarchive \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
 
-        xcodebuild -exportArchive \
-                   -archivePath $PWD/build/PinaColada.xcarchive \
-                   -exportOptionsPlist ExportOptions.plist \
-                   -exportPath $PWD/build
-
-    - name: Upload IPA to GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/PinaColada.ipa
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload xcarchive to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/PinaColada.xcarchive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
